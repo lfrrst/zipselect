@@ -13,15 +13,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r library}
 library(readr)
-
+library(readxl)
 ```
 
 ## Import Data
 
 ```{r import}
-import.df <- read_csv("testdata.csv")
 # Test/Validation
-import.df <- read_csv("validate.csv")
+import.df <- read_excel("C:/Users/Lucas/OneDrive - Forrest/Work/UWT Lecturer/AU21 TBUS 301C/Zip Code Selections.xlsx")
 head(import.df)
 ```
 
@@ -58,4 +57,18 @@ print(paste("Max iterations: ", maxiter))
 print(paste("Iterations performed: ", counter))
 print(paste("Duplicates remain: ", any(duplicated(selections.df[,4]))))
 head(selections.df)
+```
+
+## Output
+
+```{r}
+
+write.csv(selections.df, "selections.csv")
+
+```
+
+## Dedup
+
+```{r}
+
 ```
