@@ -14,6 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r library}
 library(readr)
 library(readxl)
+library(tidyverse)
+library(naniar)
 ```
 
 ## Import Data
@@ -35,11 +37,10 @@ for (r in 1:nrow(import.df)){
   selections.df[r, 1:3] <- import.df[r, 1:3]
   rn <- sample(4:8, 1)
   selections.df[r, 4] <- import.df[r, rn]
-  selections.df[r, 5] <- rn
 }
 
 counter <- 0
-maxiter <- 20 # nrow(selections.df)*5
+maxiter <- nrow(selections.df)*5
 
 while (counter <  maxiter | any(duplicated(selections.df[,4]))) {
   counter <- sum(counter, 1)
@@ -59,16 +60,51 @@ print(paste("Duplicates remain: ", any(duplicated(selections.df[,4]))))
 head(selections.df)
 ```
 
+## Dedup
+
+```{r}
+zip2.df <- import.df
+for (col in 4:ncol(zip2.df)){
+  for (row in 1:nrow(zip2.df)){
+    if (zip2.df[row, col] == selections.df[row, 4])
+      zip2.df[row, col] <- NA
+  }
+}
+```
+
+## Selections 2
+
+```{r}
+
+for (r in 1:nrow(zip2.df)){
+  rn <- sample(4:8, 1)
+  selections.df[r, 5] <- zip2.df[r, rn]
+  while (is.na(selections.df[r, 5])){
+    rn <- sample(4:8, 1)
+    selections.df[r, 5] <- zip2.df[r, rn]
+  } 
+}
+
+counter <- 0
+maxiter <- nrow(selections.df)*5
+
+while (counter <  maxiter | any(duplicated(selections.df[,4]))) {
+  counter <- sum(counter, 1)
+  dup.df <- data.frame(duplicated(selections.df[,4]))
+  for (r in 1:nrow(dup.df)){
+    if(dup.df[r,] == TRUE){
+      rn <- sample(4:8, 1)
+      selections.df[r, 5] <- zip2.df[r, rn]
+    }
+  }
+}
+
+```
+
 ## Output
 
 ```{r}
 
 write.csv(selections.df, "selections.csv")
-
-```
-
-## Dedup
-
-```{r}
 
 ```
